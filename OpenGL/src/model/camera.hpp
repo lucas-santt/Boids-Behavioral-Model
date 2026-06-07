@@ -1,9 +1,6 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "../config.hpp"
 
 enum Camera_Movement {
     FORWARD,
@@ -64,7 +61,7 @@ public:
         updateCameraVectors();
     }
 
-    glm::mat4 GetViewMatrix() {
+    glm::mat4 GetView() {
         return glm::lookAt(position, position + front, up);
     }
 
@@ -117,5 +114,3 @@ private:
         up    = glm::normalize(glm::cross(right, front));
     }
 };
-
-#endif
