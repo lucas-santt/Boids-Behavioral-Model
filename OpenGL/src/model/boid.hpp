@@ -9,7 +9,7 @@ public:
     float speed;
 
     Boid(
-        glm::vec3 position       = glm::vec3(0.0f, -1.0f, -3.0f),
+        glm::vec3 position       = glm::vec3(0.0f, 0.0f, 0.0f),
         float     init_velocity  = 2.0f,
         glm::vec3 forward        = glm::vec3(0.0f, 0.0, -1.0f),
         glm::vec3 worldUp        = glm::vec3(0.0f, 1.0f, 0.0f)
@@ -21,20 +21,7 @@ public:
     { }
 
     void update(const float dt) {
-        glm::vec3 right = glm::normalize(glm::cross(forward, worldUp));
-        glm::vec3 up    = glm::normalize(glm::cross(right, forward));
-        worldSteering = (right * steering.x) + (up * steering.y) + (forward * steering.z);
-
-        glm::vec3 velocity = (forward * speed) + (worldSteering * dt);
-
-        float curr_speed = glm::length(velocity); // Can use length2 instead
-        if(curr_speed > BOID_MAX_SPEED)
-            velocity = glm::normalize(velocity) * BOID_MAX_SPEED;
-        else if(curr_speed < BOID_MIN_SPEED)
-            velocity = glm::normalize(velocity) * BOID_MIN_SPEED;
-
-        position += velocity * dt;
-        forward = glm::normalize(velocity);
+        geometricFlight(dt);
     }
 
     glm::mat4 getModelTransform() {
@@ -63,4 +50,21 @@ private:
     glm::vec3 forward;
     glm::vec3 worldUp;
     glm::vec3 worldSteering; // Will we need it in the future???
+
+    void geometricFlight(float dt) {
+        glm::vec3 right = glm::normalize(glm::cross(forward, worldUp));
+        glm::vec3 up    = glm::normalize(glm::cross(right, forward));
+        worldSteering = (right * steering.x) + (up * steering.y) + (forward * steering.z);
+
+        glm::vec3 velocity = (forward * speed) + (worldSteering * dt);
+
+        float curr_speed = glm::length(velocity); // Can use length2 instead
+        if(curr_speed > BOID_MAX_SPEED)
+            velocity = glm::normalize(velocity) * BOID_MAX_SPEED;
+        else if(curr_speed < BOID_MIN_SPEED)
+            velocity = glm::normalize(velocity) * BOID_MIN_SPEED;
+
+        position += velocity * dt;
+        forward = glm::normalize(velocity);
+    }
 };
