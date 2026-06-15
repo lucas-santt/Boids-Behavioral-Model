@@ -13,9 +13,9 @@ public:
         boids.push_back(Boid());
     }
 
-    void update(float dt) {
+    void update(const float dt) {
         for(Boid& boid : boids) {
-            boid.update();
+            boid.update(dt);
         }
     }
 

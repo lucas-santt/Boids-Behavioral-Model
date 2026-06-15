@@ -1,14 +1,21 @@
 CC = g++
-FLAGS = -Wall -std=c++20
+FLAGS = -Wall -std=c++20 -MMD -MP
 LIBS = -lglfw3 -lGL
 
 TARGETS = main
 
 all: $(TARGETS)
 
-# Remeber to have a lib folder containing glad
-main: src/main.cpp lib/glad.c 
-	$(CC) $(FLAGS) src/main.cpp lib/glad.c -o main  $(LIBS)
+main: main.o lib/glad.o
+	$(CC) $(FLAGS) main.o lib/glad.o -o main $(LIBS)
+
+main.o: src/main.cpp
+	$(CC) $(FLAGS) -c src/main.cpp -o main.o
+
+lib/glad.o: lib/glad.c
+	$(CC) $(FLAGS) -c lib/glad.c -o lib/glad.o
+
+-include main.d lib/glad.d
 
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS) main.o main.d lib/glad.o lib/glad.d
