@@ -5,9 +5,6 @@
 #include "material.hpp"
 #include "../model/scene.hpp"
 
-const int SCR_WIDTH = 600;
-const int SCR_HEIGHT = 800;
-
 class Renderer {
 public:
     int width, height;
@@ -20,14 +17,22 @@ public:
 
     ~Renderer() {
         delete(triangleMesh);
-        delete(triangleMaterial);
+        delete(boidMaterial);
+        delete(cubeMesh);
+        delete(cubeMaterial);
+        delete(wireframeMaterial);
     }
 
-    void render(Scene* scene) {
+    void render(Scene* scene, float time) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         
-        std::vector<Shader> shaders = {triangleMaterial->shader, cubeMaterial->shader};
+        std::vector<Shader> shaders = {
+            boidMaterial->shader, 
+            cubeMaterial->shader,
+            wireframeMaterial->shader
+        };
         
         glm::mat4 projection = glm::perspective(
             glm::radians(scene->camera.zoom), 
@@ -42,12 +47,29 @@ public:
             s.setMat4("view", scene->camera.GetView());
         }
 
+        // Render Scene Obejcts 
+
+        boidMaterial->shader.use();
         for(Boid& boid : scene->boids) {
-            triangleMaterial->shader.setMat4("model", boid.getModelTransform());
+            boidMaterial->shader.setFloat("uTime", time);
+            boidMaterial->shader.setMat4("model", boid.getModelTransform());
             triangleMesh->draw();
         }
+
+        // Fill cubes
+        cubeMaterial->shader.use();
         for(Object& cube : scene->cubes) {
+            if(cube.wireframe || !cube.enabled) continue;
             cubeMaterial->shader.setMat4("model", cube.getModelTransform());
+            cubeMesh->draw();
+        }
+
+        // Wireframes cubes
+        wireframeMaterial->shader.use();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        for(Object&cube: scene->cubes) {
+            if(!cube.wireframe || !cube.enabled) continue;
+            wireframeMaterial->shader.setMat4("model", cube.getModelTransform());
             cubeMesh->draw();
         }
 
@@ -58,8 +80,9 @@ private:
     GLFWwindow* window;
     Mesh* triangleMesh;
     Mesh* cubeMesh;
-    Material* triangleMaterial;
+    Material* boidMaterial;
     Material* cubeMaterial;
+    Material* wireframeMaterial;
 
     void setUpOpenGL(GLFWwindow* window) {
         if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -67,12 +90,13 @@ private:
         }
         
         glEnable(GL_DEPTH_TEST);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     void makeAssets() {
         triangleMesh = new Mesh(TRIANGLE_VERTICES);
-        triangleMaterial = new Material(
-            "src/shaders/default_shader.vs", 
+        boidMaterial = new Material(
+            "src/shaders/boid_shader.vs", 
             "src/shaders/default_shader.fs"
         );
 
@@ -80,6 +104,11 @@ private:
         cubeMaterial = new Material(
             "src/shaders/default_shader.vs",
             "src/shaders/default_shader.fs"
+        );
+
+        wireframeMaterial = new Material(
+            "src/shaders/default_shader.vs",
+            "src/shaders/wireframe_shader.fs"
         );
     }
 };

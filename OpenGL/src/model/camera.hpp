@@ -11,7 +11,7 @@ enum Camera_Movement {
 
 const float YAW         = -90.0f;
 const float PITCH       =  0.0f;
-const float SPEED       =  2.5f;
+const float SPEED       =  4.5f;
 const float SENSITIVITY =  0.1f;
 const float ZOOM        =  45.0f;
 
@@ -28,6 +28,7 @@ public:
     float pitch;
 
     float movementSpeed;
+    float movementMult;
     float mouseSensitivity;
     float zoom; // Or FOV
 
@@ -38,6 +39,7 @@ public:
         float pitch        = PITCH
     ) : front(glm::vec3(0.0f, 0.0f, -1.0f)),
         movementSpeed(SPEED),
+        movementMult(1.0f),
         mouseSensitivity(SENSITIVITY), 
         zoom(ZOOM)
     {
@@ -66,7 +68,7 @@ public:
     }
 
     void ProcessKeyboard(Camera_Movement direction, float deltaTime) {
-        float velocity = movementSpeed * deltaTime;
+        float velocity = movementSpeed * movementMult * deltaTime;
         if(direction == FORWARD)
             position += front * velocity;
         else if(direction == BACKWARD)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <random>
 #include <vector>
 #include <span>
 
@@ -16,6 +17,13 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <glm/gtc/constants.hpp>
+
+// WINDOW
+
+const int SCR_WIDTH = 1200;
+const int SCR_HEIGHT = 1000;
+
+// MODEL
 
 // Triangle is based on z-axis because
 // boids need to point to it's forward direction (z-axis)
@@ -47,7 +55,20 @@ const unsigned int CUBE_INDICES[] = {
     1, 2, 6,  6, 5, 1
 };
 
-const float BOID_MIN_SPEED = 0.0f;
-const float BOID_MAX_SPEED = 10.0f;
+// BOID
+const glm::vec3 BOID_SCALE = glm::vec3(0.2f);
 
-const float CUBE_AREA_LENGTH = 10.0f;
+const float BOID_MIN_SPEED = 0.0f;
+const float BOID_MAX_SPEED = 1.0f;
+const float BOID_VISION_RADIUS = 3.0f;
+const float BOID_MAX_ACCELERATION = 2.4f;
+
+const float BOID_COLLISION_AVOIDANCE_WEIGHT = 0.7f;
+const float BOID_VELOCITY_MATCHING_WEIGHT   = 1.0f;
+const float BOID_FLOCK_CENTERING_WEIGHT     = 0.7f;
+
+// SCENE
+const float CUBE_AREA_LENGTH = 20.0f;
+const float GROUND_LENGTH = 30.0f;
+
+const int NUMBER_OF_BOIDS = 400;

@@ -30,7 +30,7 @@ public:
 
             scene->update(deltaTime);
 
-            renderer->render(scene);
+            renderer->render(scene, currentFrame);
 
             glfwPollEvents();
         }
@@ -60,6 +60,7 @@ private:
 
         glfwMakeContextCurrent(window);
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+        glfwSetKeyCallback(window, key_callback);
         glfwSetCursorPosCallback(window, mouse_callback);
         glfwSetScrollCallback(window, scroll_callback);
 
@@ -88,6 +89,25 @@ private:
             scene->camera.ProcessKeyboard(LEFT, deltaTime);
         if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             scene->camera.ProcessKeyboard(RIGHT, deltaTime);
+    }
+
+    static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        App* app = static_cast<App*>(glfwGetWindowUserPointer(window));
+
+        if(action == GLFW_PRESS) {
+            if(key == GLFW_KEY_G)
+                app->scene->cubes[0].enabled = !app->scene->cubes[0].enabled;
+            else if(key == GLFW_KEY_H)
+                app->scene->cubes[1].enabled = !app->scene->cubes[1].enabled;
+            
+            else if(key == GLFW_KEY_LEFT_SHIFT)
+                app->scene->camera.movementMult++;
+            else if(key == GLFW_KEY_LEFT_CONTROL)
+                app->scene->camera.movementMult--;
+
+            else if(key == GLFW_KEY_R)
+                app->scene->resetBoids();
+        }
     }
 
     static void mouse_callback(GLFWwindow* window, double xPosIn, double yPosIn) {
