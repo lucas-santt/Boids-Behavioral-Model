@@ -34,11 +34,13 @@ public:
             wireframeMaterial->shader
         };
         
+        // TODO: We could optmize by creating and sending the 
+        // projection matrix only when the camera zoom or the resolution changes
         glm::mat4 projection = glm::perspective(
             glm::radians(scene->camera.zoom), 
             (float)this->width / (float)this->height, 
             0.1f, 
-            100.0f
+            200.0f
         );
 
         for(Shader& s: shaders) {

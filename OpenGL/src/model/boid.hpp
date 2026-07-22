@@ -1,21 +1,27 @@
 #pragma once
 
 #include "../config.hpp"
+#include "spatialHash.hpp"
 
 class Boid {
 public:
+    int id;
+    glm::ivec3 cellIndex;
+
     glm::vec3 position;
     glm::vec3 scale;
     glm::vec3 steering; // "Acceleration" vector
     float speed;
 
     Boid(
+        int id,
         glm::vec3 position       = glm::vec3(0.0f),
         glm::vec3 scale          = glm::vec3(1.0f),
         float     init_velocity  = 0.0f,
         glm::vec3 forward        = glm::vec3(0.0f, 0.0, -1.0f),
         glm::vec3 worldUp        = glm::vec3(0.0f, 1.0f, 0.0f)
-    ) : position(position),
+    ) : id(id),
+        position(position),
         scale(scale),
         steering(forward), 
         speed(init_velocity),
@@ -23,10 +29,12 @@ public:
         worldUp(worldUp)
     { }
 
-    void update(const float dt, std::span<Boid> boids) {
-        boidBehavior(boids);
+    void update(const float dt, std::span<Boid> boids, SpatialHashGrid& spatialGrid) {
+        boidBehavior(boids, spatialGrid);
         geometricFlight(dt);
         checkBoundaries();
+
+        spatialGrid.update(this->id, this->position, BOID_VISION_RADIUS, this->cellIndex);
     }
 
     glm::mat4 getModelTransform() {
@@ -95,18 +103,21 @@ private:
         }
     }
 
-    void boidBehavior(std::span<Boid> boids) {
+    void boidBehavior(std::span<Boid> boids, SpatialHashGrid& spatialGrid) {
         glm::vec3 collision_avoidance = glm::vec3(0.0f);
-        glm::vec3 velocity_matching   = this->forward;
+        glm::vec3 velocity_matching   = this->forward * this->speed;
         glm::vec3 flock_centering     = this->position;
         int nearby_boids = 1; // Consider itself
 
-        for(Boid& b: boids) {
-            if(&b == this) continue;
+        std::vector<int> neighbors = spatialGrid.getNeighbors(position, BOID_VISION_RADIUS);
+
+        for(int nID: neighbors) {
+            if(nID == this->id) continue;
+            Boid b = boids[nID];
 
             float distance = glm::length(b.position - this->position);
             if(distance > BOID_VISION_RADIUS) continue;
-
+            
             // Collision Avoidance
             glm::vec3 repulse = this->position - b.position;
             if(glm::length(repulse) != 0) collision_avoidance += glm::normalize(repulse) / distance;

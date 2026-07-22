@@ -4,6 +4,7 @@
 #include <random>
 #include <vector>
 #include <span>
+#include <unordered_set>
 
 #include <fstream>
 #include <sstream>
@@ -29,9 +30,9 @@ const int SCR_HEIGHT = 1000;
 // boids need to point to it's forward direction (z-axis)
 const float TRIANGLE_VERTICES[] = {
      // Coords           Colors
-      0.0f, 0.0f,  0.5f,  0.6f, 0.6f, 1.0f,
-      0.5f, 0.0f, -0.5f,  0.6f, 0.6f, 1.0f,
-     -0.5f, 0.0f, -0.5f,  0.6f, 0.6f, 1.0f
+      0.0f, 0.0f,  0.5f,  0.8f, 0.8f, 1.0f,
+      0.5f, 0.0f, -0.5f,  0.8f, 0.8f, 1.0f,
+     -0.5f, 0.0f, -0.5f,  0.4f, 0.4f, 0.8f
 };
 
 const float CUBE_VERTICES[] = {
@@ -56,19 +57,21 @@ const unsigned int CUBE_INDICES[] = {
 };
 
 // BOID
-const glm::vec3 BOID_SCALE = glm::vec3(0.2f);
+const glm::vec3 BOID_SCALE = glm::vec3(0.4f);
+const float BOID_VISION_RADIUS = 5.0f;
+const int NEIGHBORS_CAP = 30;
 
-const float BOID_MIN_SPEED = 0.0f;
-const float BOID_MAX_SPEED = 1.0f;
-const float BOID_VISION_RADIUS = 3.0f;
-const float BOID_MAX_ACCELERATION = 2.4f;
+const float BOID_MIN_SPEED = 3.5f;
+const float BOID_MAX_SPEED = 5.0f;
+const float BOID_MAX_ACCELERATION = 3.4f;
 
 const float BOID_COLLISION_AVOIDANCE_WEIGHT = 0.7f;
 const float BOID_VELOCITY_MATCHING_WEIGHT   = 1.0f;
 const float BOID_FLOCK_CENTERING_WEIGHT     = 0.7f;
 
 // SCENE
-const float CUBE_AREA_LENGTH = 20.0f;
-const float GROUND_LENGTH = 30.0f;
+const float CUBE_AREA_LENGTH = 40.0f;
+const float GROUND_LENGTH = 50.0f;
+const glm::vec3 GRID_DIMENSIONS = glm::vec3(20.0f, 20.0f, 20.0f);
 
-const int NUMBER_OF_BOIDS = 400;
+const int NUMBER_OF_BOIDS = 1600;

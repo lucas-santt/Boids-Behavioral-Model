@@ -4,10 +4,12 @@
 #include "camera.hpp"
 #include "object.hpp"
 #include "boid.hpp"
+#include "spatialHash.hpp"
 
 class Scene {
 public:
     Camera camera;
+    SpatialHashGrid spatialGrid;
     std::vector<Boid> boids;
     std::vector<Object> cubes; 
 
@@ -25,27 +27,34 @@ public:
             true
         ));
 
-        for(int i=0; i<NUMBER_OF_BOIDS; i++) {
-            boids.push_back(spawnRandomBoid());
-        }
+        spatialGrid = SpatialHashGrid(glm::vec3(-CUBE_AREA_LENGTH), glm::vec3(CUBE_AREA_LENGTH), GRID_DIMENSIONS);
+        for(int i=0; i<NUMBER_OF_BOIDS; i++)
+            spawnRandomBoid(i);
     }
 
     void update(const float dt) {
         for(Boid& boid : boids)
-            boid.update(dt, boids);
+            boid.update(dt, boids, spatialGrid);
     }
 
     void resetBoids() {
+        boids.clear();
+        spatialGrid = SpatialHashGrid(glm::vec3(-CUBE_AREA_LENGTH), glm::vec3(CUBE_AREA_LENGTH), GRID_DIMENSIONS);
+
         for(int i=0; i<NUMBER_OF_BOIDS; i++)
-            boids[i] = spawnRandomBoid();
+            spawnRandomBoid(i);
     }
 
 private:
-    Boid spawnRandomBoid() {
+    void spawnRandomBoid(int id) {
         glm::vec3 pos     = randomVec3(-CUBE_AREA_LENGTH/2, CUBE_AREA_LENGTH/2);
         glm::vec3 forward = randomVec3(-1.0f, 1.0f);
         float init_vel    = randomFloat(BOID_MIN_SPEED, BOID_MAX_SPEED);
-        return Boid(pos, BOID_SCALE, init_vel, forward);
+
+        Boid newBoid = Boid(id, pos, BOID_SCALE, init_vel, forward);
+    
+        spatialGrid.newClient(id, newBoid.position, BOID_VISION_RADIUS, newBoid.cellIndex);
+        boids.push_back(newBoid);
     }
 
     glm::vec3 randomVec3(float low_bound, float high_bound) {
