@@ -11,7 +11,7 @@
   </tr>
 </table>
 
-This project was made for the course [MAC0420 (Intro. to Computer Graphics)][MAC0420] at IME-USP (University of São Paulo), taught by the professor [Carlos Hitoshi][Hitoshi]. Made with WebGL 2.0.
+This project was made for the course [MAC0420 (Intro. to Computer Graphics)][MAC0420] at IME-USP (University of São Paulo), taught by the professor [Carlos Hitoshi][Hitoshi]. Made with OpenGL 4.5 and WebGL 2.0.
 
 ## Flocks and schools
 
@@ -55,23 +55,31 @@ My implementation follow Reynolds's philosophy, although each object in the scen
 
 By suggestion of the course professor, I have implemented some extra details to give the simulation more life and/or complexity.
 
-#### Obstacles
+### OpenGL
+
+##### Linear boid algorithm!
+
+By implementing a spatial hashing algorithm into boid behaviour, I reduced the simulation's time complexity from O(n²) to O(n)
+
+### WebGL
+
+##### Obstacles
 
 The simulation is filled with a specific number of obstacles in which the _boids_ avoid. These can separate a _boid_ from a school, forcing it to follow a natural path to find a new one.
 
-#### Multiple schools
+##### Multiple schools
 
 A new steering rule was added to give each _boid_ a school group in which it shares with other flockmates, each school group has a random assigned color and a random number of flocks. Every _boid_ only has alignment and cohesion to other mates that belong to the same school, running away from other _boids_ that belong to different schools.
 
-#### _Boid_'s Leader
+##### _Boid_'s Leader
 
 The model has one specific _boid_ that doesn't follow any rules and has a semi-automatic movement controled by the user. It doesn't belongs to any school group and affects its flockmates behaviour, although its behaviour only changes within user input.
 
-#### Predator
+##### Predator
 
 The simulation has a predator flying over the _boids_, the mouse input controls its position. Contrary to the nature of predators, this one doesn't eat any _boids_ but scare them. Every _boid_ tries to run away from the predator in the same way as they avoid obstacles.
 
-#### Flocking animation
+##### Flocking animation
 
 An exclusive shader for the _boids_ was made to give them a nice flocking animation.
 
@@ -80,6 +88,26 @@ An exclusive shader for the _boids_ was made to give them a nice flocking animat
 Every aspect of the model has a parameter that can be altered. These parameters can be found at [scene-config.js](src/scripts/scene-config.js)
 
 ## Controls
+
+### OpenGL
+
+#### Camera
+
+- `a`, `w`, `s`, `d`: Move Camera
+
+- `mouse`: Rotate Camera
+
+- `mouse scroll`: Camera zoom
+
+#### Scene
+
+- `r`: Reset Boids
+
+- `h`: Toggle aquarium wireframe/borders
+
+- `g`: Toggle ground render
+
+### WebGL
 
 - `+` / `=` : Adds a new _boid_ to the simulation
     - On initialization, a random group and, therefore, a random color is given to the created _boid_
